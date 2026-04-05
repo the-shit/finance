@@ -3,9 +3,11 @@
 namespace TheShit\Finance;
 
 use Illuminate\Support\ServiceProvider;
+use TheShit\Finance\Contracts\FinanceDataProvider;
 use TheShit\Finance\Plaid\PlaidConnector;
 use TheShit\Finance\Privacy\AmountBucketer;
 use TheShit\Finance\Privacy\PrivacyTransformer;
+use TheShit\Finance\Providers\PlaidProvider;
 
 class FinanceServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,13 @@ class FinanceServiceProvider extends ServiceProvider
                 clientId:    config('finance.plaid.client_id'),
                 secret:      config('finance.plaid.secret'),
                 environment: config('finance.plaid.environment'),
+            );
+        });
+
+        $this->app->singleton(FinanceDataProvider::class, function ($app) {
+            return new PlaidProvider(
+                connector:   $app->make(PlaidConnector::class),
+                accessToken: config('finance.plaid.access_token'),
             );
         });
 
