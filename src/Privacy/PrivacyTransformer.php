@@ -2,7 +2,7 @@
 
 namespace TheShit\Finance\Privacy;
 
-use EchoLabs\Prism\Facades\Prism;
+use Prism\Prism\Facades\Prism;
 use Illuminate\Support\Collection;
 use TheShit\Finance\Plaid\DTOs\Transaction;
 

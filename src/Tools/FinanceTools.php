@@ -2,7 +2,7 @@
 
 namespace TheShit\Finance\Tools;
 
-use EchoLabs\Prism\Tool;
+use Prism\Prism\Tool;
 
 /**
  * Registry of all available finance tools.
