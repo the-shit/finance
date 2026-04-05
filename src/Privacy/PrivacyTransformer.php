@@ -2,6 +2,7 @@
 
 namespace TheShit\Finance\Privacy;
 
+use Prism\Prism\Enums\Provider;
 use Prism\Prism\Facades\Prism;
 use Illuminate\Support\Collection;
 use TheShit\Finance\Plaid\DTOs\Transaction;
@@ -99,7 +100,7 @@ class PrivacyTransformer
         ]);
 
         $response = Prism::text()
-            ->usingOllama($this->model, $this->endpoint)
+            ->using(Provider::Ollama, $this->model)
             ->withSystemPrompt(self::SYSTEM_PROMPT)
             ->withPrompt($prompt)
             ->generate();
