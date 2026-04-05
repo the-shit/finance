@@ -3,12 +3,13 @@
 return [
 
     'plaid' => [
-        'client_id'   => env('PLAID_CLIENT_ID'),
-        'secret'      => env('PLAID_SECRET'),
-        'environment' => env('PLAID_ENVIRONMENT', 'sandbox'), // sandbox | development | production
-        'products'    => ['transactions'],
+        'client_id'    => env('PLAID_CLIENT_ID'),
+        'secret'       => env('PLAID_SECRET'),
+        'access_token' => env('PLAID_ACCESS_TOKEN'), // permanent token from ExchangePublicToken
+        'environment'  => env('PLAID_ENVIRONMENT', 'sandbox'), // sandbox | development | production
+        'products'     => ['transactions'],
         'country_codes' => ['US'],
-        'webhook'     => env('PLAID_WEBHOOK_URL'),
+        'webhook'      => env('PLAID_WEBHOOK_URL'),
     ],
 
     'privacy' => [
