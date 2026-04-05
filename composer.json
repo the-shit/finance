@@ -1,0 +1,38 @@
+{
+    "name": "the-shit/finance",
+    "description": "Personal finance tooling for Laravel — Plaid integration, privacy-first AI analysis, reusable Prism tools.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^11.0|^12.0",
+        "prism-php/prism": "^0.99",
+        "saloonphp/saloon": "^3.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0",
+        "pestphp/pest": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "TheShit\\Finance\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TheShit\\Finance\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "TheShit\\Finance\\FinanceServiceProvider"
+            ],
+            "aliases": {
+                "Finance": "TheShit\\Finance\\Facades\\Finance"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
