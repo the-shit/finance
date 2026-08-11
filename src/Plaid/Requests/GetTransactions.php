@@ -2,15 +2,19 @@
 
 namespace TheShit\Finance\Plaid\Requests;
 
+use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Saloon\Traits\Body\HasJsonBody;
 
 /**
  * Date-range transaction fetch (Plaid /transactions/get).
  * Prefer this for expert spend windows; use SyncTransactions for incremental store updates.
  */
-class GetTransactions extends Request
+class GetTransactions extends Request implements HasBody
 {
+    use HasJsonBody;
+
     protected Method $method = Method::POST;
 
     public function __construct(
