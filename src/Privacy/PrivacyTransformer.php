@@ -2,9 +2,9 @@
 
 namespace TheShit\Finance\Privacy;
 
-use EchoLabs\Prism\Facades\Prism;
 use Illuminate\Support\Collection;
 use TheShit\Finance\Plaid\DTOs\Transaction;
+use RuntimeException;
 
 /**
  * Prepares financial data for a cloud AI provider.
@@ -98,7 +98,12 @@ class PrivacyTransformer
             json_encode($stripped, JSON_PRETTY_PRINT),
         ]);
 
-        $response = Prism::text()
+        if (! class_exists(\EchoLabs\Prism\Facades\Prism::class)) {
+            // Prism optional — rule-strip only when cloud privacy model unavailable.
+            return new CloudPayload(task: $task, data: $stripped, meta: ['fallback' => true, 'reason' => 'prism_missing']);
+        }
+
+        $response = \EchoLabs\Prism\Facades\Prism::text()
             ->usingOllama($this->model, $this->endpoint)
             ->withSystemPrompt(self::SYSTEM_PROMPT)
             ->withPrompt($prompt)
