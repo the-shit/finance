@@ -35,23 +35,29 @@ final class Transaction
 
     public static function fromPlaid(array $data): self
     {
+        $category = $data['category'] ?? null;
+        if (! is_array($category) || $category === []) {
+            $primary = $data['personal_finance_category']['primary'] ?? null;
+            $category = is_string($primary) && $primary !== '' ? [$primary] : [];
+        }
+
         return new self(
-            transactionId:  $data['transaction_id'],
-            accountId:      $data['account_id'],
-            amount:         $data['amount'],
-            currencyCode:   $data['iso_currency_code'] ?? 'USD',
-            name:           $data['name'],
-            merchantName:   $data['merchant_name'] ?? null,
-            date:           Carbon::parse($data['date']),
-            authorizedAt:   isset($data['authorized_datetime'])
-                                ? Carbon::parse($data['authorized_datetime'])
-                                : null,
-            category:       $data['category'] ?? [],
-            categoryId:     $data['category_id'] ?? null,
+            transactionId: $data['transaction_id'],
+            accountId: $data['account_id'],
+            amount: (float) $data['amount'],
+            currencyCode: $data['iso_currency_code'] ?? 'USD',
+            name: $data['name'] ?? ($data['merchant_name'] ?? 'unknown'),
+            merchantName: $data['merchant_name'] ?? null,
+            date: Carbon::parse($data['date']),
+            authorizedAt: isset($data['authorized_datetime'])
+                ? Carbon::parse($data['authorized_datetime'])
+                : null,
+            category: $category,
+            categoryId: $data['category_id'] ?? null,
             paymentChannel: $data['payment_channel'] ?? 'other',
-            pending:        $data['pending'],
-            logoUrl:        $data['logo_url'] ?? null,
-            website:        $data['website'] ?? null,
+            pending: (bool) ($data['pending'] ?? false),
+            logoUrl: $data['logo_url'] ?? null,
+            website: $data['website'] ?? null,
         );
     }
 }

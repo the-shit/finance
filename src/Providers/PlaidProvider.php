@@ -10,6 +10,7 @@ use TheShit\Finance\Plaid\DTOs\Account;
 use TheShit\Finance\Plaid\DTOs\Transaction;
 use TheShit\Finance\Plaid\PlaidConnector;
 use TheShit\Finance\Plaid\Requests\GetAccounts;
+use TheShit\Finance\Plaid\Requests\GetTransactions;
 use TheShit\Finance\Plaid\Requests\SyncTransactions;
 
 class PlaidProvider implements FinanceDataProvider
@@ -29,18 +30,25 @@ class PlaidProvider implements FinanceDataProvider
 
     public function transactions(Carbon $from, Carbon $to): Collection
     {
-        $all    = collect();
-        $cursor = null;
+        $all = collect();
+        $offset = 0;
+        $batchSize = 500;
+        $start = $from->toDateString();
+        $end = $to->toDateString();
 
         do {
-            $result = $this->sync($cursor);
-            $all    = $all->merge($result->added);
-            $cursor = $result->nextCursor;
-        } while ($result->hasMore);
+            $response = $this->connector->send(
+                new GetTransactions($this->accessToken, $start, $end, $batchSize, $offset)
+            );
 
-        return $all->filter(
-            fn (Transaction $t) => $t->date->between($from, $to)
-        )->values();
+            $batch = collect($response->json('transactions') ?? [])
+                ->map(fn (array $t) => Transaction::fromPlaid($t));
+            $all = $all->merge($batch);
+            $total = (int) ($response->json('total_transactions') ?? $all->count());
+            $offset += $batchSize;
+        } while ($offset < $total);
+
+        return $all->values();
     }
 
     public function sync(?string $cursor = null): SyncResult
@@ -52,11 +60,11 @@ class PlaidProvider implements FinanceDataProvider
         $data = $response->json();
 
         return new SyncResult(
-            added:      collect($data['added'])->map(fn ($t) => Transaction::fromPlaid($t)),
-            modified:   collect($data['modified'])->map(fn ($t) => Transaction::fromPlaid($t)),
-            removed:    collect($data['removed']),
-            nextCursor: $data['next_cursor'],
-            hasMore:    $data['has_more'],
+            added: collect($data['added'] ?? [])->map(fn ($t) => Transaction::fromPlaid($t)),
+            modified: collect($data['modified'] ?? [])->map(fn ($t) => Transaction::fromPlaid($t)),
+            removed: collect($data['removed'] ?? []),
+            nextCursor: $data['next_cursor'] ?? '',
+            hasMore: (bool) ($data['has_more'] ?? false),
         );
     }
 }

@@ -3,12 +3,18 @@
 return [
 
     'plaid' => [
-        'client_id'   => env('PLAID_CLIENT_ID'),
-        'secret'      => env('PLAID_SECRET'),
-        'environment' => env('PLAID_ENVIRONMENT', 'sandbox'), // sandbox | development | production
-        'products'    => ['transactions'],
+        'client_id' => env('PLAID_CLIENT_ID'),
+        'secret' => env('PLAID_SECRET'),
+        // Prefer PLAID_ENVIRONMENT; PLAID_ENV matches Lexi.
+        'environment' => env('PLAID_ENVIRONMENT', env('PLAID_ENV', 'sandbox')), // sandbox | development | production
+        'products' => ['transactions'],
         'country_codes' => ['US'],
-        'webhook'     => env('PLAID_WEBHOOK_URL'),
+        'webhook' => env('PLAID_WEBHOOK_URL'),
+        // Comma-separated Plaid item access tokens (one or more). When set with client_id/secret, experts use live Plaid.
+        'access_tokens' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('PLAID_ACCESS_TOKENS', (string) env('PLAID_ACCESS_TOKEN', ''))),
+        ))),
     ],
 
     'privacy' => [
